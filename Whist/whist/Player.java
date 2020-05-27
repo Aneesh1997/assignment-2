@@ -11,25 +11,26 @@ public class Player {
     private Hand playingHand;
     private Actor scoreActor;
     private Card selected;
-
-    // Set up human player for interaction
-    CardListener cardListener = new CardAdapter();
+    private CardListener cardListener = new CardAdapter() {
+        public void leftDoubleClicked(Card card) { selected = card; playingHand.setTouchEnabled(false); }
+    };
 
     public Player(int playerID, Hand playingHand, Actor scoreActor) {
         this.playerID = playerID;
         this.playingHand = playingHand;
         this.scoreActor = scoreActor;
-        playingHand.setTouchEnabled(false);
-
-
-        CardListener cardListener = new CardAdapter()  // Human Player plays card
-        {
-            public void leftDoubleClicked(Card card) { selected = card; playingHand.setTouchEnabled(false); }
-        };
-        playingHand.addCardListener(cardListener);
+        this.playingHand.addCardListener(cardListener);
     }
 
+    public void setPlayingHand() {
+        this.playingHand.setTouchEnabled((true));
+    }
 
+    public Card getSelected() {
+        return this.selected;
+    }
+
+    public Hand getPlayingHand() {return this.playingHand; }
 
 
 }
