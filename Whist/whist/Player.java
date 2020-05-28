@@ -9,26 +9,15 @@ import java.util.concurrent.ThreadLocalRandom;
 public class Player {
     int playerID;
     private Hand playingHand;
-    private Actor scoreActor;
-    private Card selected;
-    private CardListener cardListener = new CardAdapter() {
-        public void leftDoubleClicked(Card card) { selected = card; playingHand.setTouchEnabled(false); }
-    };
+    private int score;
 
-    public Player(int playerID, Hand playingHand, Actor scoreActor) {
+    public Player(int playerID, Hand playingHand, int score) {
         this.playerID = playerID;
         this.playingHand = playingHand;
-        this.scoreActor = scoreActor;
-        this.playingHand.addCardListener(cardListener);
+        this.score = score;
     }
 
-    public void setPlayingHand() {
-        this.playingHand.setTouchEnabled((true));
-    }
-
-    public Card getSelected() {
-        return this.selected;
-    }
+    public void setPlayingHand() { this.playingHand.setTouchEnabled((true)); }
 
     public Hand getPlayingHand() {return this.playingHand; }
 

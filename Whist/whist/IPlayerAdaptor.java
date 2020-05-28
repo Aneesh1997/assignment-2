@@ -5,4 +5,6 @@ public interface IPlayerAdaptor{
     public Card play();
 
     public Hand getHand();
+
+    //public void updateScore();
 }
