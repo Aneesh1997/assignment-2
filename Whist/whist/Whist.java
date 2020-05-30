@@ -85,8 +85,8 @@ public class Whist extends CardGame {
   private Location hideLocation = new Location(-500, - 500);
   private Location trumpsActorLocation = new Location(50, 50);
 
-  private IPlayerAdaptor basicNPC;
-  private IPlayerAdaptor humanPlayer;
+  private HumanPlayer human;
+
 
   public void setStatus(String string) { setStatusText	(string); }
   
@@ -116,8 +116,7 @@ private void initRound() {
 		 for (int i = 0; i < nbPlayers; i++) {
 			   hands[i].sort(Hand.SortType.SUITPRIORITY, true);
 		 }
-		 humanPlayer = new HumanAdaptor(0, hands[0], scores[0]);
-		 basicNPC = new BasicNPCAdaptor(hands[1], 1, scores[1]);
+		 human = new HumanPlayer(0, hands[0]);
 		 // Set up human player for interaction
 //		CardListener cardListener = new CardAdapter()  // Human Player plays card
 //			    {
@@ -130,23 +129,10 @@ private void initRound() {
 	      layouts[i] = new RowLayout(handLocations[i], handWidth);
 	      layouts[i].setRotationAngle(90 * i);
 	      // layouts[i].setStepDelay(10);
-			if (i == 0) {
-				System.out.println("hello");
-				humanPlayer.getHand().setView(this, layouts[i]);
-				humanPlayer.getHand().setTargetArea(new TargetArea(trickLocation));
-				humanPlayer.getHand().draw();
-			} else if (i==1) {
-				basicNPC.getHand().setView(this, layouts[i]);
-				basicNPC.getHand().setTargetArea(new TargetArea(trickLocation));
-				basicNPC.getHand().draw();
-			} else {
-				hands[i].setView(this, layouts[i]);
-				hands[i].setTargetArea(new TargetArea(trickLocation));
-				hands[i].draw();
-			}
-//	      hands[i].setView(this, layouts[i]);
-//	      hands[i].setTargetArea(new TargetArea(trickLocation));
-//	      hands[i].draw();
+
+	      hands[i].setView(this, layouts[i]);
+	      hands[i].setTargetArea(new TargetArea(trickLocation));
+	      hands[i].draw();
 	    }
 //	    for (int i = 1; i < nbPlayers; i++)  // This code can be used to visually hide the cards in a hand (make them face down)
 //	      hands[i].setVerso(true);
@@ -169,15 +155,13 @@ private Optional<Integer> playRound() {  // Returns winner, if any
 		trick = new Hand(deck);
     	selected = null;
         if (0 == nextPlayer) {  // Select lead depending on player type
+        	//hands[0].setTouchEnabled((true));
+			//human.setTouchEnabled();
     		setStatus("Player 0 double-click on card to lead.");
 			while (null == selected) {
-				selected = humanPlayer.play();
+				selected = human.playCard();
 				delay(100);
 			}
-        } else if (1 == nextPlayer) {
-    		setStatusText("Player " + nextPlayer + " thinking...");
-            delay(thinkingTime);
-            selected = basicNPC.play();
         } else {
 			setStatusText("Player " + nextPlayer + " thinking...");
 			delay(thinkingTime);
@@ -197,15 +181,20 @@ private Optional<Integer> playRound() {  // Returns winner, if any
 			if (++nextPlayer >= nbPlayers) nextPlayer = 0;  // From last back to first
 			selected = null;
 	        if (0 == nextPlayer) {
-	    		setStatus("Player 0 double-click on card to follow.");
-	    		while (null == selected) {
-					selected = humanPlayer.play();
-	    			delay(100);
+//	        	hands[0].setTouchEnabled(true);
+//	    		setStatus("Player 0 double-click on card to follow.");
+//	    		while (null == selected) {
+//	    			delay(100);
+//				}
+
+	    		// Test
+				//human.setTouchEnabled();
+				setStatus("Player 0 double-click on card to lead.");
+				while (null == selected) {
+					selected = human.playCard();
+					delay(100);
 				}
-	        } else if (1 == nextPlayer){
-				setStatusText("Player " + nextPlayer + " thinking...");
-				delay(thinkingTime);
-				selected = basicNPC.play();
+
 	        } else {
 				setStatusText("Player " + nextPlayer + " thinking...");
 				delay(thinkingTime);
