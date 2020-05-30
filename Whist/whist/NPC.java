@@ -4,6 +4,8 @@ import ch.aplu.jcardgame.Hand;
 import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 
+
+
 public abstract class NPC {
     private Hand playingHand;
     private int playerID;
@@ -21,4 +23,10 @@ public abstract class NPC {
     public Hand getPlayingHand() {return this.playingHand; }
 
     public abstract Card getCard();
+
+	public abstract Card getCard(Whist.Suit lead);
+
+	public abstract Card getCard(Whist.Suit lead, Card winningCard);
+
+	
 }

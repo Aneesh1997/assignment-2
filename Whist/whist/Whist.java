@@ -45,7 +45,7 @@ public class Whist extends CardGame {
       return list.get(x);
   }
   
-  public boolean rankGreater(Card card1, Card card2) {
+  public static boolean rankGreater(Card card1, Card card2) {
 	  return card1.getRankId() < card2.getRankId(); // Warning: Reverse rank order of cards (see comment on enum)
   }
 
@@ -55,7 +55,7 @@ public class Whist extends CardGame {
   public final int nbStartCards = 13;
 
   // Alterable properties?
-  public final int winningScore = 1;
+  public final int winningScore = 10;
   public int smartPlayers;
   public int legalPlayers;
   private boolean enforceRules=false;
@@ -84,8 +84,8 @@ public class Whist extends CardGame {
   private Hand[] hands;
   private Location hideLocation = new Location(-500, - 500);
   private Location trumpsActorLocation = new Location(50, 50);
-
-  private HumanPlayer human;
+  public static ArrayList<Card> arraycards= new ArrayList<Card>();
+  private SmartNPC human;
 
 
   public void setStatus(String string) { setStatusText	(string); }
@@ -116,7 +116,7 @@ private void initRound() {
 		 for (int i = 0; i < nbPlayers; i++) {
 			   hands[i].sort(Hand.SortType.SUITPRIORITY, true);
 		 }
-		 human = new HumanPlayer(0, hands[0]);
+		 human = new SmartNPC(hands[0], 0, 0);
 		 // Set up human player for interaction
 //		CardListener cardListener = new CardAdapter()  // Human Player plays card
 //			    {
@@ -159,7 +159,7 @@ private Optional<Integer> playRound() {  // Returns winner, if any
 			//human.setTouchEnabled();
     		setStatus("Player 0 double-click on card to lead.");
 			while (null == selected) {
-				selected = human.playCard();
+				selected = human.getCard();
 				delay(100);
 			}
         } else {
@@ -176,6 +176,7 @@ private Optional<Integer> playRound() {  // Returns winner, if any
 			selected.transfer(trick, true); // transfer to trick (includes graphic effect)
 			winner = nextPlayer;
 			winningCard = selected;
+			arraycards.add(selected);
 		// End Lead
 		for (int j = 1; j < nbPlayers; j++) {
 			if (++nextPlayer >= nbPlayers) nextPlayer = 0;  // From last back to first
@@ -191,7 +192,7 @@ private Optional<Integer> playRound() {  // Returns winner, if any
 				//human.setTouchEnabled();
 				setStatus("Player 0 double-click on card to lead.");
 				while (null == selected) {
-					selected = human.playCard();
+					selected = human.getCard(lead, winningCard);
 					delay(100);
 				}
 
@@ -222,6 +223,9 @@ private Optional<Integer> playRound() {  // Returns winner, if any
 				 selected.transfer(trick, true); // transfer to trick (includes graphic effect)
 				 System.out.println("winning: suit = " + winningCard.getSuit() + ", rank = " + winningCard.getRankId());
 				 System.out.println(" played: suit = " +    selected.getSuit() + ", rank = " +    selected.getRankId());
+				 
+				 arraycards.add(selected);
+				 System.out.println(arraycards);
 				 if ( // beat current winner with higher card
 					 (selected.getSuit() == winningCard.getSuit() && rankGreater(selected, winningCard)) ||
 					  // trumped when non-trump was winning
@@ -238,6 +242,7 @@ private Optional<Integer> playRound() {  // Returns winner, if any
 		nextPlayer = winner;
 		setStatusText("Player " + nextPlayer + " wins trick.");
 		scores[nextPlayer]++;
+		arraycards.removeAll(arraycards);
 		updateScore(nextPlayer);
 		if (winningScore == scores[nextPlayer]) return Optional.of(nextPlayer);
 	}

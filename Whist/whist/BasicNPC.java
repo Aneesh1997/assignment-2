@@ -14,4 +14,18 @@ public class BasicNPC extends NPC{
         int x = random.nextInt(this.getPlayingHand().getNumberOfCards());
         return this.getPlayingHand().get(x);
     }
+
+
+	@Override
+	public Card getCard(Whist.Suit lead) {
+		
+		return null;
+	}
+
+
+	@Override
+	public Card getCard(Whist.Suit lead, Card winningCard) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }
