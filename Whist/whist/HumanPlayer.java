@@ -21,6 +21,7 @@ public class HumanPlayer extends Player {
     public Card playCard() {
         selected = null;
         this.getPlayingHand().setTouchEnabled(true);
+        GUI.getInstance().setStatus("Player 0 double-click on card to lead.");
         while(null == selected) delay(100);
         return this.selected;
     }

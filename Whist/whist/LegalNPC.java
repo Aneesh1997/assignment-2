@@ -2,6 +2,7 @@ import ch.aplu.jcardgame.Card;
 import ch.aplu.jcardgame.Hand;
 
 public class LegalNPC extends Player{
+    private int ThinkingTime = 2000;
 
     public LegalNPC(int playerID, Hand hand) {
         super(playerID, hand);
@@ -10,6 +11,8 @@ public class LegalNPC extends Player{
 
 
     public Card playCard(Whist.Suit lead, Card winningCard) {
+        GUI.getInstance().setStatus("Player " + this.playerID + " thinking...");
+        GUI.getInstance().delay(ThinkingTime);
 
         Hand current = getPlayingHand();
         if (current.getNumberOfCardsWithSuit(lead) > 0){
@@ -22,6 +25,8 @@ public class LegalNPC extends Player{
 
     @Override
     public Card playCard() {
+        GUI.getInstance().setStatus("Player " + this.playerID + " thinking...");
+        GUI.getInstance().delay(ThinkingTime);
         // TODO Auto-generated method stub
         return getPlayingHand().get(Whist.random.nextInt(getPlayingHand().getNumberOfCards()));
     }

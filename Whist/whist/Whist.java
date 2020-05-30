@@ -62,6 +62,9 @@ public class Whist extends CardGame {
   // Load in properties
   Properties whistProperties = new Properties();
 
+  // Init GUI
+  private GUI gui;
+
 
   // Alterable properties?
   public int winningScore;
@@ -144,16 +147,17 @@ private void initRound() {
 		 }
 		 players = playerFactory.getPlayers(hands, basicPlayers,legalPlayers,smartPlayers,nbPlayers);
 		 // graphics
-	    RowLayout[] layouts = new RowLayout[nbPlayers];
-	    for (int i = 0; i < nbPlayers; i++) {
-	      layouts[i] = new RowLayout(handLocations[i], handWidth);
-	      layouts[i].setRotationAngle(90 * i);
-	      // layouts[i].setStepDelay(10);
-
-	      hands[i].setView(this, layouts[i]);
-	      hands[i].setTargetArea(new TargetArea(trickLocation));
-	      hands[i].draw();
-	    }
+		gui.initRound(hands);
+//	    RowLayout[] layouts = new RowLayout[nbPlayers];
+//	    for (int i = 0; i < nbPlayers; i++) {
+//	      layouts[i] = new RowLayout(handLocations[i], handWidth);
+//	      layouts[i].setRotationAngle(90 * i);
+//	      // layouts[i].setStepDelay(10);
+//
+//	      hands[i].setView(this, layouts[i]);
+//	      hands[i].setTargetArea(new TargetArea(trickLocation));
+//	      hands[i].draw();
+//	    }
 //	    for (int i = 1; i < nbPlayers; i++)  // This code can be used to visually hide the cards in a hand (make them face down)
 //	      hands[i].setVerso(true);
 	    // End graphics
@@ -163,8 +167,9 @@ private void initRound() {
 private Optional<Integer> playRound() {  // Returns winner, if any
 	// Select and display trump suit
 		final Suit trumps = randomEnum(Suit.class);
-		final Actor trumpsActor = new Actor("sprites/"+trumpImage[trumps.ordinal()]);
-	    addActor(trumpsActor, trumpsActorLocation);
+		gui.showTrumpsSuit(trumps);
+//		final Actor trumpsActor = new Actor("sprites/"+trumpImage[trumps.ordinal()]);
+//	    addActor(trumpsActor, trumpsActorLocation);
 	// End trump suit
 	Hand trick;
 	int winner;
@@ -175,17 +180,12 @@ private Optional<Integer> playRound() {  // Returns winner, if any
 		trick = new Hand(deck);
     	selected = null;
     	if (0 == nextPlayer) {
-			setStatus("Player 0 double-click on card to lead.");
 			selected = players.get(nextPlayer).playCard();
 		} else {
-			setStatusText("Player " + nextPlayer + " thinking...");
-			delay(thinkingTime);
 			selected = players.get(nextPlayer).playCard();
 		}
-        // Lead with selected card
-	        trick.setView(this, new RowLayout(trickLocation, (trick.getNumberOfCards()+2)*trickWidth));
-			trick.draw();
-			selected.setVerso(false);
+		// Lead with selected card
+		gui.updateTrick(trick);
 			// No restrictions on the card being lead
 			lead = (Suit) selected.getSuit();
 			selected.transfer(trick, true); // transfer to trick (includes graphic effect)
@@ -201,17 +201,12 @@ private Optional<Integer> playRound() {  // Returns winner, if any
 			selected = null;
 
 			if (0 == nextPlayer) {
-				setStatus("Player 0 double-click on card to lead.");
 				selected = players.get(nextPlayer).playCard();
 			} else {
-				setStatusText("Player " + nextPlayer + " thinking...");
-				delay(thinkingTime);
 				selected = players.get(nextPlayer).playCard(lead, winningCard);
 			}
 	        // Follow with selected card
-		        trick.setView(this, new RowLayout(trickLocation, (trick.getNumberOfCards()+2)*trickWidth));
-				trick.draw();
-				selected.setVerso(false);  // In case it is upside down
+			gui.updateTrick(trick);
 				// Check: Following card must follow suit if possible
 					if (selected.getSuit() != lead && hands[nextPlayer].getNumberOfCardsWithSuit(lead) > 0) {
 						 // Rule violation
@@ -244,24 +239,21 @@ private Optional<Integer> playRound() {  // Returns winner, if any
 				 }
 			// End Follow
 		}
-		delay(600);
-		trick.setView(this, new RowLayout(hideLocation, 0));
-		trick.draw();		
-		nextPlayer = winner;
-		setStatusText("Player " + nextPlayer + " wins trick.");
+		gui.endTrick(trick, winner);
 		scores[nextPlayer]++;
+		gui.updateScore(nextPlayer, scores);
 		arraycards.removeAll(arraycards);
-		updateScore(nextPlayer);
+		//updateScore(nextPlayer);
 		if (winningScore == scores[nextPlayer]) return Optional.of(nextPlayer);
 	}
-	removeActor(trumpsActor);
+	gui.removeTrumpsSuit();
+	//removeActor(trumpsActor);
 	return Optional.empty();
 }
   // Don't touch this
   public Whist() throws IOException {
     super(700, 700, 30);
-    setTitle("Whist (V" + version + ") Constructed for UofM SWEN30006 with JGameGrid (www.aplu.ch)");
-    setStatusText("Initializing...");
+    gui = new GUI(version, nbPlayers);
 
 	// Set basic properties
   	createWhistProperties("1", "3", "0", "0", "false");
@@ -288,6 +280,8 @@ private Optional<Integer> playRound() {  // Returns winner, if any
     setStatusText("Game over. Winner is player: " + winner.get());
     refresh();
   }
+
+
   // Main function
   public static void main(String[] args) throws IOException {
 	// System.out.println("Working Directory = " + System.getProperty("user.dir"));
