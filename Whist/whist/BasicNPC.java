@@ -3,15 +3,16 @@ import ch.aplu.jcardgame.Hand;
 
 import java.util.Random;
 
-public class BasicNPC extends NPC{
+public class BasicNPC extends Player{
 
-    public BasicNPC(Hand hand, int playerID, int score) {
-        super(hand, playerID, score);
+    public BasicNPC(int playerID, Hand playingHand) {
+        super(playerID, playingHand);
     }
 
-
-    public  Card getCard() {
-        int x = random.nextInt(this.getPlayingHand().getNumberOfCards());
-        return this.getPlayingHand().get(x);
+    @Override
+    public  Card playCard() {
+        return Whist.randomCard(getPlayingHand());
     }
+
+    public Card playCard(Whist.Suit lead, Card winningCard) { return Whist.randomCard(getPlayingHand()); }
 }

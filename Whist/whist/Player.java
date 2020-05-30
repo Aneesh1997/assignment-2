@@ -19,4 +19,7 @@ public abstract class Player {
 
     public Hand getPlayingHand() {return this.playingHand; }
 
+    public abstract Card playCard();
+
+    public abstract Card playCard(Whist.Suit lead, Card winningCard);
 }
