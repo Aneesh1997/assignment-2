@@ -10,7 +10,7 @@ public class LegalNPC extends Player{
     }
 
 
-    public Card playCard(Whist.Suit lead, Card winningCard) {
+    public Card playCard(Whist.Suit lead, Card winningCard, Whist.Suit trumps) {
         GUI.getInstance().setStatus("Player " + this.playerID + " thinking...");
         GUI.getInstance().delay(ThinkingTime);
 

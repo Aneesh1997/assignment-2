@@ -201,7 +201,7 @@ private Optional<Integer> playRound() {  // Returns winner, if any
 		for (int j = 1; j < nbPlayers; j++) {
 			if (++nextPlayer >= nbPlayers) nextPlayer = 0;  // From last back to first
 			selected = null;
-			selected = players.get(nextPlayer).playCard(lead, winningCard);
+			selected = players.get(nextPlayer).playCard(lead, winningCard, trumps);
 
 	        // Follow with selected card
 			gui.updateTrick(trick);
@@ -224,7 +224,8 @@ private Optional<Integer> playRound() {  // Returns winner, if any
 				 System.out.println("winning: suit = " + winningCard.getSuit() + ", rank = " + winningCard.getRankId());
 				 System.out.println(" played: suit = " +    selected.getSuit() + ", rank = " +    selected.getRankId());
 				 arraycards.add(selected);
-				 System.out.println(arraycards);
+				 System.out.println(players.get(nextPlayer));
+				 
 
 
 				 if ( // beat current winner with higher card
@@ -238,8 +239,9 @@ private Optional<Integer> playRound() {  // Returns winner, if any
 			// End Follow
 		}
 		gui.endTrick(trick, winner);
-		scores[nextPlayer]++;
-		gui.updateScore(nextPlayer, scores);
+		nextPlayer=winner;
+		scores[winner]++;
+		gui.updateScore(winner, scores);
 		arraycards.removeAll(arraycards);
 		//updateScore(nextPlayer);
 		if (winningScore == scores[nextPlayer]) return Optional.of(nextPlayer);
@@ -256,7 +258,7 @@ private Optional<Integer> playRound() {  // Returns winner, if any
   	createWhistProperties("0","20", "1","3", "0", "0","13", "false");
 	FileReader inStream = null;
 	try {
-	  inStream = new FileReader("config.properties");
+	  inStream = new FileReader("legal.properties");
 	  whistProperties.load(inStream);
 	} catch (IOException e) {
 		e.printStackTrace();

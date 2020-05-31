@@ -27,7 +27,7 @@ public class HumanPlayer extends Player {
     }
 
     @Override
-    public Card playCard(Whist.Suit lead, Card winningCard) {
+    public Card playCard(Whist.Suit lead, Card winningCard,Whist.Suit trumps) {
         selected = null;
         this.getPlayingHand().setTouchEnabled(true);
         GUI.getInstance().setStatus("Player 0 double-click on card to lead.");

@@ -23,5 +23,5 @@ public abstract class Player {
 
     public abstract Card playCard();
 
-    public abstract Card playCard(Whist.Suit lead, Card winningCard);
+    public abstract Card playCard(Whist.Suit lead, Card winningCard, Whist.Suit trumps);
 }

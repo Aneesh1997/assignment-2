@@ -17,7 +17,7 @@ public class BasicNPC extends Player{
         return Whist.randomCard(getPlayingHand());
     }
 
-    public Card playCard(Whist.Suit lead, Card winningCard) {
+    public Card playCard(Whist.Suit lead, Card winningCard,Whist.Suit trumps) {
         GUI.getInstance().setStatus("Player " + this.playerID + " thinking...");
         GUI.getInstance().delay(ThinkingTime);
         return Whist.randomCard(getPlayingHand()); }
