@@ -9,26 +9,31 @@ public class PlayerFactory {
         players = new ArrayList<>();
     }
 
-    public ArrayList<Player> getPlayers(Hand[] hands, int basicNPCs, int legalNPCs, int smartNPCs, int nBplayers) {
+    public ArrayList<Player> getPlayers(Hand[] hands,int humanPlayers, int basicNPCs, int legalNPCs, int smartNPCs, int nBplayers) {
         int handCount = 0;
-        // Add human player
-        players.add(new HumanPlayer(handCount, hands[handCount]));
-        handCount++;
 
         // Add robot players
-        for (int i = 1; i < nBplayers; i++) {
+        for (int i = 0; i < nBplayers; i++) {
+            // Add human player
+            if (humanPlayers > 0) {
+                players.add(new HumanPlayer(handCount, hands[handCount]));
+                handCount++;
+                humanPlayers--;
             // Add basicNPCs
-            if (basicNPCs > 0) {
+            } else if (basicNPCs > 0) {
                 players.add(new BasicNPC(handCount, hands[handCount]));
                 handCount++;
+                basicNPCs--;
             } else if (legalNPCs > 0) {
                 // DO SOMETHING
                 players.add(new LegalNPC(handCount, hands[handCount]));
                 handCount++;
+                legalNPCs--;
             } else if (smartNPCs > 0) {
                 // DO SOMETHING
                 players.add(new SmartNPC(handCount, hands[handCount]));
                 handCount++;
+                smartNPCs--;
             }
         }
 

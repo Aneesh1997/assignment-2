@@ -29,7 +29,8 @@ public class Whist extends CardGame {
   
   final String trumpImage[] = {"bigspade.gif","bigheart.gif","bigdiamond.gif","bigclub.gif"};
 
-  static final Random random = ThreadLocalRandom.current();
+  //static final Random random = ThreadLocalRandom.current();
+  static Random random = new Random();
   
   // return random Enum value
   public static <T extends Enum<?>> T randomEnum(Class<T> clazz){
@@ -56,7 +57,7 @@ public class Whist extends CardGame {
   // Unchanged variables
   private final String version = "1.0";
   public final int nbPlayers = 4;
-  public final int nbStartCards = 13;
+  public final int nbStartCards = 1;
   public static ArrayList<Card> arraycards= new ArrayList<Card>();
 
   // Load in properties
@@ -67,7 +68,9 @@ public class Whist extends CardGame {
 
 
   // Alterable properties?
+  private int seed;
   public int winningScore;
+  public int humanPlayers;
   public int basicPlayers;
   public int smartPlayers;
   public int legalPlayers;
@@ -93,10 +96,7 @@ public class Whist extends CardGame {
   private Actor[] scoreActors = {null, null, null, null };
   private final Location trickLocation = new Location(350, 350);
   private final Location textLocation = new Location(350, 450);
-  private final int thinkingTime = 2000;
-  private Hand[] hands;
-  private Location hideLocation = new Location(-500, - 500);
-  private Location trumpsActorLocation = new Location(50, 50);
+  private Hand[] hands = new Hand[nbPlayers];
 
   private ArrayList<Player> players;
   private PlayerFactory playerFactory = new PlayerFactory();
@@ -107,8 +107,10 @@ private int[] scores = new int[nbPlayers];
 
 Font bigFont = new Font("Serif", Font.BOLD, 36);
 
-private void createWhistProperties(String winningScore, String basicPlayers, String legalPlayers, String smartPlayers, String enforceRules) {
+private void createWhistProperties(String seed,String winningScore,String humanPlayers, String basicPlayers, String legalPlayers, String smartPlayers, String enforceRules) {
+	whistProperties.setProperty("Seed", seed);
 	whistProperties.setProperty("WinningScore", winningScore);
+	whistProperties.setProperty("HumanPlayers", humanPlayers);
 	whistProperties.setProperty("BasicNPCs", basicPlayers);
 	whistProperties.setProperty("LegalNPCs", legalPlayers);
 	whistProperties.setProperty("SmartNPCs", smartPlayers);
@@ -116,7 +118,9 @@ private void createWhistProperties(String winningScore, String basicPlayers, Str
 }
 
 private void setWhistProperties() {
+	this.seed = Integer.parseInt(whistProperties.getProperty("Seed"));
 	this.winningScore = Integer.parseInt(whistProperties.getProperty("WinningScore"));
+	this.humanPlayers = Integer.parseInt(whistProperties.getProperty("HumanPlayers"));
 	this.basicPlayers = Integer.parseInt(whistProperties.getProperty("BasicNPCs"));
 	this.legalPlayers = Integer.parseInt(whistProperties.getProperty("LegalNPCs"));
 	this.smartPlayers = Integer.parseInt(whistProperties.getProperty("SmartNPCs"));
@@ -131,36 +135,46 @@ private void initScore() {
 	 }
   }
 
-private void updateScore(int player) {
-	removeActor(scoreActors[player]);
-	scoreActors[player] = new TextActor(String.valueOf(scores[player]), Color.WHITE, bgColor, bigFont);
-	addActor(scoreActors[player], scoreLocations[player]);
-}
-
 private Card selected;
 
 // Change this?
 private void initRound() {
-		 hands = deck.dealingOut(nbPlayers, nbStartCards); // Last element of hands is leftover cards; these are ignored
+		if(seed!=0)
+		{Hand deck1 = deck.toHand(false);
+			random.setSeed(seed);
+
+
+			for (int i = 0; i < 4; i++) {
+
+				Card b=randomCard(deck1);
+				hands[i] = new Hand(b.getDeck());
+				deck1.remove(b, false);
+				hands[i].insert(b, true);
+
+				for (int j=2;j<=nbStartCards;++j ) {
+
+					b=randomCard(deck1);
+
+
+					{hands[i].insert(b,true);}
+					deck1.remove(b, false);
+
+				}
+
+
+			}
+		}
+		else
+		{
+			hands=deck.dealingOut(nbPlayers, nbStartCards,true);
+		}
+		 //hands = deck.dealingOut(nbPlayers, nbStartCards); // Last element of hands is leftover cards; these are ignored
 		 for (int i = 0; i < nbPlayers; i++) {
 			   hands[i].sort(Hand.SortType.SUITPRIORITY, true);
 		 }
-		 players = playerFactory.getPlayers(hands, basicPlayers,legalPlayers,smartPlayers,nbPlayers);
+		 players = playerFactory.getPlayers(hands, humanPlayers, basicPlayers,legalPlayers,smartPlayers,nbPlayers);
 		 // graphics
 		gui.initRound(hands);
-//	    RowLayout[] layouts = new RowLayout[nbPlayers];
-//	    for (int i = 0; i < nbPlayers; i++) {
-//	      layouts[i] = new RowLayout(handLocations[i], handWidth);
-//	      layouts[i].setRotationAngle(90 * i);
-//	      // layouts[i].setStepDelay(10);
-//
-//	      hands[i].setView(this, layouts[i]);
-//	      hands[i].setTargetArea(new TargetArea(trickLocation));
-//	      hands[i].draw();
-//	    }
-//	    for (int i = 1; i < nbPlayers; i++)  // This code can be used to visually hide the cards in a hand (make them face down)
-//	      hands[i].setVerso(true);
-	    // End graphics
  }
 
  // Refactor this
@@ -168,8 +182,6 @@ private Optional<Integer> playRound() {  // Returns winner, if any
 	// Select and display trump suit
 		final Suit trumps = randomEnum(Suit.class);
 		gui.showTrumpsSuit(trumps);
-//		final Actor trumpsActor = new Actor("sprites/"+trumpImage[trumps.ordinal()]);
-//	    addActor(trumpsActor, trumpsActorLocation);
 	// End trump suit
 	Hand trick;
 	int winner;
@@ -199,12 +211,8 @@ private Optional<Integer> playRound() {  // Returns winner, if any
 		for (int j = 1; j < nbPlayers; j++) {
 			if (++nextPlayer >= nbPlayers) nextPlayer = 0;  // From last back to first
 			selected = null;
+			selected = players.get(nextPlayer).playCard(lead, winningCard);
 
-			if (0 == nextPlayer) {
-				selected = players.get(nextPlayer).playCard();
-			} else {
-				selected = players.get(nextPlayer).playCard(lead, winningCard);
-			}
 	        // Follow with selected card
 			gui.updateTrick(trick);
 				// Check: Following card must follow suit if possible
@@ -256,7 +264,7 @@ private Optional<Integer> playRound() {  // Returns winner, if any
     gui = new GUI(version, nbPlayers);
 
 	// Set basic properties
-  	createWhistProperties("1", "3", "0", "0", "false");
+  	createWhistProperties("30006","1", "0","3", "0", "0", "false");
 	FileReader inStream = null;
 	try {
 	  inStream = new FileReader("config.properties");
