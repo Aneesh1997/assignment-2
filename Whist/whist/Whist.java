@@ -57,7 +57,7 @@ public class Whist {
   // Unchanged variables
   private final String version = "1.0";
   public final int nbPlayers = 4;
-  public final int nbStartCards = 1;
+  public int nbStartCards = 13;
   public static ArrayList<Card> arraycards= new ArrayList<Card>();
 
   // Load in properties
@@ -85,13 +85,14 @@ public class Whist {
 private int[] scores = new int[nbPlayers];
 
 
-private void createWhistProperties(String seed,String winningScore,String humanPlayers, String basicPlayers, String legalPlayers, String smartPlayers, String enforceRules) {
+private void createWhistProperties(String seed,String winningScore,String humanPlayers, String basicPlayers, String legalPlayers, String smartPlayers, String enforceRules, String nbStartCards) {
 	whistProperties.setProperty("Seed", seed);
 	whistProperties.setProperty("WinningScore", winningScore);
 	whistProperties.setProperty("HumanPlayers", humanPlayers);
 	whistProperties.setProperty("BasicNPCs", basicPlayers);
 	whistProperties.setProperty("LegalNPCs", legalPlayers);
 	whistProperties.setProperty("SmartNPCs", smartPlayers);
+	whistProperties.setProperty("StartingHand", nbStartCards);
 	whistProperties.setProperty("enforceRules", enforceRules);
 }
 
@@ -102,6 +103,7 @@ private void setWhistProperties() {
 	this.basicPlayers = Integer.parseInt(whistProperties.getProperty("BasicNPCs"));
 	this.legalPlayers = Integer.parseInt(whistProperties.getProperty("LegalNPCs"));
 	this.smartPlayers = Integer.parseInt(whistProperties.getProperty("SmartNPCs"));
+	this.nbStartCards = Integer.parseInt(whistProperties.getProperty("StartingHand"));
 	this.enforceRules = Boolean.parseBoolean(whistProperties.getProperty("enforceRules"));
 }
 
@@ -251,7 +253,7 @@ private Optional<Integer> playRound() {  // Returns winner, if any
     gui = new GUI(version, nbPlayers);
 
 	// Set basic properties
-  	createWhistProperties("30006","1", "0","3", "0", "0", "false");
+  	createWhistProperties("0","20", "1","3", "0", "0","13", "false");
 	FileReader inStream = null;
 	try {
 	  inStream = new FileReader("config.properties");
