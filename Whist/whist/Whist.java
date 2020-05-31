@@ -13,7 +13,7 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.logging.LogManager;
 
 @SuppressWarnings("serial")
-public class Whist extends CardGame {
+public class Whist {
 	
   public enum Suit
   {
@@ -57,7 +57,7 @@ public class Whist extends CardGame {
   // Unchanged variables
   private final String version = "1.0";
   public final int nbPlayers = 4;
-  public final int nbStartCards = 1;
+  public int nbStartCards = 13;
   public static ArrayList<Card> arraycards= new ArrayList<Card>();
 
   // Load in properties
@@ -65,7 +65,7 @@ public class Whist extends CardGame {
 
   // Init GUI
   private GUI gui;
-
+  private boolean sameGame = false;
 
   // Alterable properties?
   private int seed;
@@ -77,43 +77,22 @@ public class Whist extends CardGame {
   private boolean enforceRules=false;
 
   // Randomisation Controller idea: 30006, first digit represents trump suit?
-
-  private final int handWidth = 400;
-  private final int trickWidth = 40;
   private final Deck deck = new Deck(Suit.values(), Rank.values(), "cover");
-  private final Location[] handLocations = {
-			  new Location(350, 625),
-			  new Location(75, 350),
-			  new Location(350, 75),
-			  new Location(625, 350)
-	  };
-  private final Location[] scoreLocations = {
-			  new Location(575, 675),
-			  new Location(25, 575),
-			  new Location(575, 25),
-			  new Location(650, 575)
-	  };
-  private Actor[] scoreActors = {null, null, null, null };
-  private final Location trickLocation = new Location(350, 350);
-  private final Location textLocation = new Location(350, 450);
   private Hand[] hands = new Hand[nbPlayers];
 
   private ArrayList<Player> players;
   private PlayerFactory playerFactory = new PlayerFactory();
-
-  public void setStatus(String string) { setStatusText	(string); }
-  
 private int[] scores = new int[nbPlayers];
 
-Font bigFont = new Font("Serif", Font.BOLD, 36);
 
-private void createWhistProperties(String seed,String winningScore,String humanPlayers, String basicPlayers, String legalPlayers, String smartPlayers, String enforceRules) {
+private void createWhistProperties(String seed,String winningScore,String humanPlayers, String basicPlayers, String legalPlayers, String smartPlayers, String enforceRules, String nbStartCards) {
 	whistProperties.setProperty("Seed", seed);
 	whistProperties.setProperty("WinningScore", winningScore);
 	whistProperties.setProperty("HumanPlayers", humanPlayers);
 	whistProperties.setProperty("BasicNPCs", basicPlayers);
 	whistProperties.setProperty("LegalNPCs", legalPlayers);
 	whistProperties.setProperty("SmartNPCs", smartPlayers);
+	whistProperties.setProperty("StartingHand", nbStartCards);
 	whistProperties.setProperty("enforceRules", enforceRules);
 }
 
@@ -124,14 +103,13 @@ private void setWhistProperties() {
 	this.basicPlayers = Integer.parseInt(whistProperties.getProperty("BasicNPCs"));
 	this.legalPlayers = Integer.parseInt(whistProperties.getProperty("LegalNPCs"));
 	this.smartPlayers = Integer.parseInt(whistProperties.getProperty("SmartNPCs"));
+	this.nbStartCards = Integer.parseInt(whistProperties.getProperty("StartingHand"));
 	this.enforceRules = Boolean.parseBoolean(whistProperties.getProperty("enforceRules"));
 }
 
 private void initScore() {
 	 for (int i = 0; i < nbPlayers; i++) {
 		 scores[i] = 0;
-		 scoreActors[i] = new TextActor("0", Color.WHITE, bgColor, bigFont);
-		 addActor(scoreActors[i], scoreLocations[i]);
 	 }
   }
 
@@ -172,7 +150,19 @@ private void initRound() {
 		 for (int i = 0; i < nbPlayers; i++) {
 			   hands[i].sort(Hand.SortType.SUITPRIORITY, true);
 		 }
-		 players = playerFactory.getPlayers(hands, humanPlayers, basicPlayers,legalPlayers,smartPlayers,nbPlayers);
+		 //players = playerFactory.getPlayers(hands, humanPlayers, basicPlayers,legalPlayers,smartPlayers,nbPlayers);
+		if (sameGame==false)
+		{
+			players = playerFactory.getPlayers(hands, humanPlayers, basicPlayers,legalPlayers,smartPlayers,nbPlayers);
+			System.out.println(players);
+			sameGame=true;
+		}
+		else
+		{
+			for (int i = 0; i < nbPlayers; i++) {
+				players.get(i).setHand(hands[i]);
+			}
+	}
 		 // graphics
 		gui.initRound(hands);
  }
@@ -260,11 +250,10 @@ private Optional<Integer> playRound() {  // Returns winner, if any
 }
   // Don't touch this
   public Whist() throws IOException {
-    super(700, 700, 30);
     gui = new GUI(version, nbPlayers);
 
 	// Set basic properties
-  	createWhistProperties("30006","1", "0","3", "0", "0", "false");
+  	createWhistProperties("0","20", "1","3", "0", "0","13", "false");
 	FileReader inStream = null;
 	try {
 	  inStream = new FileReader("config.properties");
@@ -284,9 +273,7 @@ private Optional<Integer> playRound() {  // Returns winner, if any
       initRound();
       winner = playRound();
     } while (!winner.isPresent());
-    addActor(new Actor("sprites/gameover.gif"), textLocation);
-    setStatusText("Game over. Winner is player: " + winner.get());
-    refresh();
+    gui.endGame(Optional.of(winner.get()));
   }
 
 
