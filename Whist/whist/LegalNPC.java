@@ -25,5 +25,6 @@ public class LegalNPC extends Player{
         // TODO Auto-generated method stub
         return getPlayingHand().get(Whist.random.nextInt(getPlayingHand().getNumberOfCards()));
     }
+    
 
 }

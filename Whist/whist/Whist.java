@@ -108,6 +108,8 @@ Font bigFont = new Font("Serif", Font.BOLD, 36);
 
 private int seed;
 
+private int interactiveplayers;
+
 private void createWhistProperties(String seed,String winningScore, String basicPlayers, String legalPlayers, String smartPlayers, String enforceRules) {
 	whistProperties.setProperty("Seed", seed);
 	whistProperties.setProperty("WinningScore", winningScore);
@@ -126,6 +128,7 @@ private void setWhistProperties() {
 	this.enforceRules = Boolean.parseBoolean(whistProperties.getProperty("enforceRules"));
 	this.enforceRules = Boolean.parseBoolean(whistProperties.getProperty("enforceRules"));
 	this.nbStartCards= Integer.parseInt(whistProperties.getProperty("nbStartCards"));
+	this.interactiveplayers = Integer.parseInt(whistProperties.getProperty("interactiveplayers"));
 }
 
 private void initScore() {
@@ -144,10 +147,14 @@ private void updateScore(int player) {
 
 private Card selected;
 
+private boolean samegame=false;
+
 // Change this?
 private void initRound() {
 		 if(seed!=0)
-		 {Hand deck1 = deck.toHand(false);
+		 {
+		deck = new Deck(Suit.values(), Rank.values(), "cover");
+		Hand deck1 = deck.toHand(false);
 		 
 		 random.setSeed(seed);
 		 
@@ -173,7 +180,7 @@ private void initRound() {
 		 }
 		 }
 		 else
-		 {
+		 {	
 			 hands=deck.dealingOut(nbPlayers, nbStartCards,true);
 		 }
 		 
@@ -182,8 +189,20 @@ private void initRound() {
 			   
 			   hands[i].sort(Hand.SortType.SUITPRIORITY, true);
 		 }
-		 players = playerFactory.getPlayers(hands, basicPlayers,legalPlayers,smartPlayers,nbPlayers);
-		 // graphics
+		 if (samegame==false)
+		 {
+		 players = playerFactory.getPlayers(hands, basicPlayers,legalPlayers,smartPlayers,interactiveplayers,nbPlayers);
+		 System.out.println(players);
+		 samegame=true;
+		 }
+		 else
+		 {
+			 for (int i = 0; i < nbPlayers; i++) {
+				 players.get(i).setHand(hands[i]);
+			 }
+		 }
+		 
+		// graphics
 	    RowLayout[] layouts = new RowLayout[nbPlayers];
 	    for (int i = 0; i < nbPlayers; i++) {
 	      layouts[i] = new RowLayout(handLocations[i], handWidth);
@@ -193,6 +212,7 @@ private void initRound() {
 	      hands[i].setView(this, layouts[i]);
 	      hands[i].setTargetArea(new TargetArea(trickLocation));
 	      hands[i].draw();
+	     
 	    }
 //	    for (int i = 1; i < nbPlayers; i++)  // This code can be used to visually hide the cards in a hand (make them face down)
 //	      hands[i].setVerso(true);
@@ -201,6 +221,7 @@ private void initRound() {
 
  // Refactor this
 private Optional<Integer> playRound() {  // Returns winner, if any
+	
 	// Select and display trump suit
 		final Suit trumps = randomEnum(Suit.class);
 		final Actor trumpsActor = new Actor("sprites/"+trumpImage[trumps.ordinal()]);
@@ -211,6 +232,8 @@ private Optional<Integer> playRound() {  // Returns winner, if any
 	Card winningCard;
 	Suit lead;
 	int nextPlayer = random.nextInt(nbPlayers); // randomly select player to lead for this round
+	
+	
 	for (int i = 0; i < nbStartCards; i++) {
 		trick = new Hand(deck);
     	selected = null;
@@ -271,7 +294,7 @@ private Optional<Integer> playRound() {  // Returns winner, if any
 				 System.out.println("winning: suit = " + winningCard.getSuit() + ", rank = " + winningCard.getRankId());
 				 System.out.println(" played: suit = " +    selected.getSuit() + ", rank = " +    selected.getRankId());
 				 arraycards.add(selected);
-				 System.out.println(random);
+				 
 
 
 				 if ( // beat current winner with higher card

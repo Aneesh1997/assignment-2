@@ -14,6 +14,10 @@ public abstract class Player {
         this.playerID = playerID;
         this.playingHand = playingHand;
     }
+    public void setHand(Hand hand1) {
+		this.playingHand= hand1;
+    	
+    }
 
     public void setPlayingHand() { this.playingHand.setTouchEnabled((true)); }
 

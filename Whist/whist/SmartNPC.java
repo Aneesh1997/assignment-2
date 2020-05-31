@@ -7,7 +7,9 @@ import ch.aplu.jcardgame.Hand;
 public class SmartNPC extends Player{
 
     public SmartNPC (int playerID, Hand hand) {
-        super(playerID, hand);
+    	super(playerID, hand);
+    	System.out.println(hand);
+        
 
     }
 
@@ -57,7 +59,7 @@ public class SmartNPC extends Player{
     public Card playCard() {
         // TODO Auto-generated method stub
         ArrayList<Card> current = getPlayingHand().getCardList();
-
+        System.out.println(current);
         Card highest = current.get(0);
         for (int i = 1;i<current.size();++i)
         {
