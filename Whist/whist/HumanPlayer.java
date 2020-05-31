@@ -21,12 +21,17 @@ public class HumanPlayer extends Player {
     public Card playCard() {
         selected = null;
         this.getPlayingHand().setTouchEnabled(true);
+        GUI.getInstance().setStatus("Player 0 double-click on card to lead.");
         while(null == selected) delay(100);
         return this.selected;
     }
 
     @Override
     public Card playCard(Whist.Suit lead, Card winningCard) {
-        return null;
+        selected = null;
+        this.getPlayingHand().setTouchEnabled(true);
+        GUI.getInstance().setStatus("Player 0 double-click on card to lead.");
+        while(null == selected) delay(100);
+        return this.selected;
     }
 }
