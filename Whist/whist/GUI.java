@@ -106,7 +106,7 @@ public class GUI extends CardGame {
     }
 
     public void showTrumpsSuit(Whist.Suit trumps) {
-        final Actor trumpsActor = new Actor("sprites/"+trumpImage[trumps.ordinal()]);
+        trumpsActor = new Actor("sprites/"+trumpImage[trumps.ordinal()]);
         addActor(trumpsActor, trumpsActorLocation);
     }
 

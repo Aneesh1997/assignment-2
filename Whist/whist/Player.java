@@ -19,6 +19,8 @@ public abstract class Player {
 
     public Hand getPlayingHand() {return this.playingHand; }
 
+    public void setHand(Hand hand) { this.playingHand = hand; }
+
     public abstract Card playCard();
 
     public abstract Card playCard(Whist.Suit lead, Card winningCard);
