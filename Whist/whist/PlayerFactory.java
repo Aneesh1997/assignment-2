@@ -9,9 +9,11 @@ public class PlayerFactory {
         players = new ArrayList<>();
     }
 
-    public ArrayList<Player> getPlayers(Hand[] hands,int humanPlayers, int basicNPCs, int legalNPCs, int smartNPCs, int nBplayers) {
-        int handCount = 0;
+    private StrategyFactory strategyFactory;
 
+    public ArrayList<Player> getPlayers(Hand[] hands,int humanPlayers, int basicNPCs, int legalNPCs, int smartNPCs, int nBplayers) throws IllegalAccessException, InstantiationException, ClassNotFoundException {
+        int handCount = 0;
+        strategyFactory = StrategyFactory.getInstance();
         // Add robot players
         for (int i = 0; i < nBplayers; i++) {
             // Add human player
@@ -21,17 +23,26 @@ public class PlayerFactory {
                 humanPlayers--;
             // Add basicNPCs
             } else if (basicNPCs > 0) {
-                players.add(new BasicNPC(handCount, hands[handCount]));
+                //players.add(new BasicNPC(handCount, hands[handCount]));
+
+                // Testing for strategy
+                players.add(new NPC(handCount, hands[handCount], strategyFactory.getStrategy("BasicCardStrategy")));
                 handCount++;
                 basicNPCs--;
             } else if (legalNPCs > 0) {
                 // DO SOMETHING
-                players.add(new LegalNPC(handCount, hands[handCount]));
+                //players.add(new LegalNPC(handCount, hands[handCount]));
+
+                // Testing for strategy
+                players.add(new NPC(handCount, hands[handCount], strategyFactory.getStrategy("LegalCardStrategy")));
                 handCount++;
                 legalNPCs--;
             } else if (smartNPCs > 0) {
                 // DO SOMETHING
-                players.add(new SmartNPC(handCount, hands[handCount]));
+                //players.add(new SmartNPC(handCount, hands[handCount]));
+
+                // Testing for strategy
+                players.add(new NPC(handCount, hands[handCount], strategyFactory.getStrategy("SmartCardStrategy")));
                 handCount++;
                 smartNPCs--;
             }

@@ -80,6 +80,7 @@ public class Whist {
   private final Deck deck = new Deck(Suit.values(), Rank.values(), "cover");
   private Hand[] hands = new Hand[nbPlayers];
 
+  private int leader = -1;
   private ArrayList<Player> players;
   private PlayerFactory playerFactory = new PlayerFactory();
 private int[] scores = new int[nbPlayers];
@@ -116,7 +117,7 @@ private void initScore() {
 private Card selected;
 
 // Change this?
-private void initRound() {
+private void initRound() throws IllegalAccessException, ClassNotFoundException, InstantiationException {
 		if(seed!=0)
 		{Hand deck1 = deck.toHand(false);
 			random.setSeed(seed);
@@ -177,15 +178,16 @@ private Optional<Integer> playRound() {  // Returns winner, if any
 	int winner;
 	Card winningCard;
 	Suit lead;
-	int nextPlayer = random.nextInt(nbPlayers); // randomly select player to lead for this round
+	int nextPlayer; // randomly select player to lead for this round
+	if (leader != -1) {
+		nextPlayer = leader; // get winner from last round to lead
+	} else {
+		nextPlayer = random.nextInt(nbPlayers);
+	}
 	for (int i = 0; i < nbStartCards; i++) {
 		trick = new Hand(deck);
     	selected = null;
-    	if (0 == nextPlayer) {
-			selected = players.get(nextPlayer).playCard();
-		} else {
-			selected = players.get(nextPlayer).playCard();
-		}
+		selected = players.get(nextPlayer).playCard();
 		// Lead with selected card
 		gui.updateTrick(trick);
 			// No restrictions on the card being lead
@@ -235,13 +237,15 @@ private Optional<Integer> playRound() {  // Returns winner, if any
 					 System.out.println("NEW WINNER");
 					 winner = nextPlayer;
 					 winningCard = selected;
+
 				 }
 			// End Follow
 		}
 		gui.endTrick(trick, winner);
-		nextPlayer=winner;
-		scores[winner]++;
-		gui.updateScore(winner, scores);
+		nextPlayer = winner;
+		scores[nextPlayer]++;
+		gui.updateScore(nextPlayer, scores);
+		leader = winner;
 		arraycards.removeAll(arraycards);
 		//updateScore(nextPlayer);
 		if (winningScore == scores[nextPlayer]) return Optional.of(nextPlayer);
@@ -251,14 +255,14 @@ private Optional<Integer> playRound() {  // Returns winner, if any
 	return Optional.empty();
 }
   // Don't touch this
-  public Whist() throws IOException {
+  public Whist() throws IOException, IllegalAccessException, InstantiationException, ClassNotFoundException {
     gui = new GUI(version, nbPlayers);
 
 	// Set basic properties
   	createWhistProperties("0","20", "1","3", "0", "0","13", "false");
 	FileReader inStream = null;
 	try {
-	  inStream = new FileReader("legal.properties");
+	  inStream = new FileReader("whist.properties");
 	  whistProperties.load(inStream);
 	} catch (IOException e) {
 		e.printStackTrace();
@@ -280,7 +284,7 @@ private Optional<Integer> playRound() {  // Returns winner, if any
 
 
   // Main function
-  public static void main(String[] args) throws IOException {
+  public static void main(String[] args) throws IOException, IllegalAccessException, ClassNotFoundException, InstantiationException {
 	// System.out.println("Working Directory = " + System.getProperty("user.dir"));
     new Whist();
   }

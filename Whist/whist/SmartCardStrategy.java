@@ -1,45 +1,29 @@
-import java.awt.Component;
-import java.util.ArrayList;
-
-
 import ch.aplu.jcardgame.Card;
 import ch.aplu.jcardgame.Hand;
 
-public class SmartNPC extends Player{
+import java.util.ArrayList;
 
-    public SmartNPC (int playerID, Hand hand) {
-        super(playerID, hand);
+public class SmartCardStrategy implements ICardStrategy {
 
-    }
-
-    public Card playCard (Whist.Suit lead, Card winningCard, Whist.Suit trumps) {
-        GUI.getInstance().setStatus("Player " + this.playerID + " thinking...");
-        GUI.getInstance().delay(ThinkingTime);
-        ArrayList<Card> cons = Whist.arraycards;
-        Hand current = getPlayingHand();
+    @Override
+    public Card playCard(NPC npc, Whist.Suit lead, Card winningCard, Whist.Suit trumps) {
+        Hand current = npc.getPlayingHand();
         if (current.getNumberOfCardsWithSuit(lead) > 0){
-        	
-        	return bestPlay(current, lead, winningCard);
+
+            return bestPlay(current, lead, winningCard);
         }
         else if (current.getNumberOfCardsWithSuit(trumps) > 0) {
-        	
-        	return bestPlay(current, trumps, winningCard);
+
+            return bestPlay(current, trumps, winningCard);
         }
         else{
             return current.get(Whist.random.nextInt(current.getNumberOfCards()));
         }
-
-
-
-
     }
 
     @Override
-    public Card playCard() {
-        GUI.getInstance().setStatus("Player " + this.playerID + " thinking...");
-        GUI.getInstance().delay(ThinkingTime);
-        // TODO Auto-generated method stub
-        ArrayList<Card> current = getPlayingHand().getCardList();
+    public Card playCard(NPC npc) {
+        ArrayList<Card> current = npc.getPlayingHand().getCardList();
 
         Card highest = current.get(0);
         for (int i = 1;i<current.size();++i)
@@ -51,10 +35,14 @@ public class SmartNPC extends Player{
         }
         return highest;
     }
-    
+
+
+
+
+
     private Card bestPlay(Hand current, Whist.Suit lead, Card winningCard) {
-    	
-    	ArrayList<Card> b = current.getCardsWithSuit(lead);
+
+        ArrayList<Card> b = current.getCardsWithSuit(lead);
 
         if(b!=null)
         {Card highest = b.get(0);
@@ -80,10 +68,9 @@ public class SmartNPC extends Player{
 
         }
         return null;
-    	
-    	
-		
-    	
-    }
 
+
+
+
+    }
 }

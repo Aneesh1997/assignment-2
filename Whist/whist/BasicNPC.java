@@ -4,7 +4,6 @@ import ch.aplu.jcardgame.Hand;
 import java.util.Random;
 
 public class BasicNPC extends Player{
-    private int ThinkingTime = 2000;
 
     public BasicNPC(int playerID, Hand playingHand) {
         super(playerID, playingHand);

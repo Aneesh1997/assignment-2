@@ -9,6 +9,7 @@ import java.util.concurrent.ThreadLocalRandom;
 public abstract class Player {
     int playerID;
     private Hand playingHand;
+    protected int ThinkingTime = 2000;
 
     public Player(int playerID, Hand playingHand) {
         this.playerID = playerID;
@@ -20,6 +21,10 @@ public abstract class Player {
     public Hand getPlayingHand() {return this.playingHand; }
 
     public void setHand(Hand hand) { this.playingHand = hand; }
+
+    public int getPlayerID() {
+        return playerID;
+    }
 
     public abstract Card playCard();
 

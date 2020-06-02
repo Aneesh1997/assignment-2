@@ -2,7 +2,6 @@ import ch.aplu.jcardgame.Card;
 import ch.aplu.jcardgame.Hand;
 
 public class LegalNPC extends Player{
-    private int ThinkingTime = 2000;
 
     public LegalNPC(int playerID, Hand hand) {
         super(playerID, hand);
